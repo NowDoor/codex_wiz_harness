@@ -1,0 +1,14 @@
+{
+  "servers": {
+    "wiz": {
+      "command": "node",
+      "args": [
+        "${extensionInstallFolder:season-framework.wiz-vscode}/src/mcp/index.js"
+      ],
+      "env": {
+        "NODE_PATH": "${extensionInstallFolder:season-framework.wiz-vscode}/node_modules",
+        "WIZ_WORKSPACE": "${workspaceFolder}"
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "wiz": {
+      "command": "bash",
+      "args": [
+        "scripts/wiz-mcp-launcher.sh"
+      ]
+    }
+  }
+}

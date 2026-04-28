@@ -1,0 +1,31 @@
+{
+  "name": "wiz-ecc-codex",
+  "version": "1.0.0",
+  "description": "WIZ Codex baseline with ECC skills, agent templates, command prompts, MCP configs, and WIZ MCP integration.",
+  "author": {
+    "name": "Affaan Mustafa",
+    "email": "me@affaanmustafa.com",
+    "url": "https://x.com/affaanmustafa"
+  },
+  "homepage": "https://ecc.tools",
+  "repository": "",
+  "license": "MIT",
+  "keywords": ["codex", "wiz", "agents", "skills", "mcp", "tdd", "code-review", "security", "workflow", "automation"],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "WIZ ECC Codex",
+    "shortDescription": "Codex baseline for WIZ projects with ECC skills and WIZ MCP.",
+    "longDescription": "A project-local Codex baseline that packages ECC skills and reusable agent templates with WIZ framework instructions, command prompt shims, MCP configs, and a WIZ MCP launcher.",
+    "developerName": "WIZ Project",
+    "category": "Productivity",
+    "capabilities": ["Read", "Write"],
+    "websiteURL": "https://ecc.tools",
+    "defaultPrompt": [
+      "Use the tdd-workflow skill to write tests before implementation.",
+      "Use the security-review skill to scan for OWASP Top 10 vulnerabilities.",
+      "Use the verification-loop skill to verify correctness before shipping changes.",
+      "Use WIZ MCP tools first when working inside WIZ source, package, and project paths."
+    ]
+  }
+}

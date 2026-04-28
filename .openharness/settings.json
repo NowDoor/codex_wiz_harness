@@ -1,0 +1,22 @@
+{
+  "permission": {
+    "mode": "default",
+    "path_rules": [
+      {"pattern": "/opt/app/config/boot.py", "allow": false},
+      {"pattern": "/opt/app/config/service.py", "allow": false},
+      {"pattern": "/opt/app/project/dev/**", "allow": false}
+    ],
+    "denied_commands": [
+      "rm -rf /",
+      "wiz service restart"
+    ]
+  },
+  "mcp_servers": {
+    "wiz": {
+      "command": "bash",
+      "args": [
+        "scripts/wiz-mcp-launcher.sh"
+      ]
+    }
+  }
+}
