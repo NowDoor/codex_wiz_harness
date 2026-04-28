@@ -1,7 +1,7 @@
 {
   "name": "wiz-ecc-codex",
   "version": "1.0.0",
-  "description": "WIZ Codex baseline with ECC skills, agent templates, command prompts, MCP configs, and WIZ MCP integration.",
+  "description": "Generic WIZ Codex harness with ECC skills, WIZ sub-agents, command prompts, MCP configs, and WIZ MCP integration.",
   "author": {
     "name": "Affaan Mustafa",
     "email": "me@affaanmustafa.com",
@@ -16,16 +16,17 @@
   "interface": {
     "displayName": "WIZ ECC Codex",
     "shortDescription": "Codex baseline for WIZ projects with ECC skills and WIZ MCP.",
-    "longDescription": "A project-local Codex baseline that packages ECC skills and reusable agent templates with WIZ framework instructions, command prompt shims, MCP configs, and a WIZ MCP launcher.",
+    "longDescription": "A path-independent Codex baseline that packages ECC skills, WIZ framework instructions, WIZ-native sub-agents, command prompt shims, MCP configs, and a WIZ MCP launcher for any active WIZ workspace.",
     "developerName": "WIZ Project",
     "category": "Productivity",
     "capabilities": ["Read", "Write"],
     "websiteURL": "https://ecc.tools",
     "defaultPrompt": [
-      "Use the tdd-workflow skill to write tests before implementation.",
-      "Use the security-review skill to scan for OWASP Top 10 vulnerabilities.",
-      "Use the verification-loop skill to verify correctness before shipping changes.",
-      "Use WIZ MCP tools first when working inside WIZ source, package, and project paths."
+      "Treat this as a generic WIZ harness, not as the target application repository.",
+      "Use wiz_workspace_status to identify the active WIZ workspace and currentProject before editing.",
+      "Use WIZ MCP tools first when working inside WIZ source, package, and project paths.",
+      "Use bundled WIZ instructions from the installed harness assets and target workspace custom instructions when present.",
+      "Preserve currentProject boundaries and never modify another WIZ project without an explicit project switch."
     ]
   }
 }

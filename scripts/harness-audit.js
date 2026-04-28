@@ -177,7 +177,7 @@ function detectTargetMode(rootDir) {
 
   if (
     fileExists(rootDir, 'scripts/harness-audit.js') &&
-    fileExists(rootDir, '.claude-plugin/plugin.json') &&
+    fileExists(rootDir, '.codex-plugin/plugin.json') &&
     fileExists(rootDir, 'agents') &&
     fileExists(rootDir, 'skills')
   ) {
@@ -192,18 +192,18 @@ function findPluginInstall(rootDir) {
   const pluginDirs = [
     'ecc',
     'ecc@ecc',
-    'everything-claude-code',
-    'everything-claude-code@everything-claude-code',
+    'wiz-ecc-codex',
+    'wiz-ecc-codex@wiz-ecc',
   ];
   const candidateRoots = [
-    path.join(rootDir, '.claude', 'plugins'),
-    path.join(rootDir, '.claude', 'plugins', 'marketplaces'),
-    homeDir && path.join(homeDir, '.claude', 'plugins'),
-    homeDir && path.join(homeDir, '.claude', 'plugins', 'marketplaces'),
+    path.join(rootDir, '.codex', 'plugins'),
+    path.join(rootDir, '.codex', 'plugins', 'marketplaces'),
+    homeDir && path.join(homeDir, '.codex', 'plugins'),
+    homeDir && path.join(homeDir, '.codex', 'plugins', 'marketplaces'),
   ].filter(Boolean);
   const candidates = candidateRoots.flatMap((pluginsDir) =>
     pluginDirs.flatMap((pluginDir) => [
-      path.join(pluginsDir, pluginDir, '.claude-plugin', 'plugin.json'),
+      path.join(pluginsDir, pluginDir, '.codex-plugin', 'plugin.json'),
       path.join(pluginsDir, pluginDir, 'plugin.json'),
     ])
   );
@@ -493,10 +493,10 @@ function getConsumerChecks(rootDir) {
       category: 'Tool Coverage',
       points: 4,
       scopes: ['repo'],
-      path: '~/.claude/plugins/ecc/ (legacy everything-claude-code paths also supported)',
-      description: 'Everything Claude Code is installed for the active user or project',
+      path: '~/.codex/plugins/wiz-ecc-codex/',
+      description: 'WIZ ECC Codex plugin is installed for the active user or project',
       pass: Boolean(pluginInstall),
-      fix: 'Install the ECC plugin for this user or project before auditing project-specific harness quality.',
+      fix: 'Install the WIZ ECC Codex plugin for this user or project before auditing harness quality.',
     },
     {
       id: 'consumer-project-overrides',

@@ -20,6 +20,30 @@ config_file = "agents/reviewer.toml"
 description = "Documentation specialist that verifies APIs, framework behavior, and release notes."
 config_file = "agents/docs-researcher.toml"
 
+[agents.wiz_architect]
+description = "WIZ architecture planner for layer boundaries, MCP tool selection, and implementation routing."
+config_file = "agents/wiz-architect.toml"
+
+[agents.wiz_source_developer]
+description = "WIZ Source App specialist for src/app pages, layouts, components, Pug, Service, and frontend behavior."
+config_file = "agents/wiz-source-developer.toml"
+
+[agents.wiz_backend_developer]
+description = "WIZ backend specialist for controllers, routes, api.py, models, Struct patterns, and response/query rules."
+config_file = "agents/wiz-backend-developer.toml"
+
+[agents.wiz_package_developer]
+description = "WIZ Portal Package specialist for src/portal packages, package README authority, portal.json, libs, styles, and components."
+config_file = "agents/wiz-package-developer.toml"
+
+[agents.wiz_build_troubleshooter]
+description = "WIZ build and troubleshooting specialist for build modes, Pug/API/cache failures, logs, and framework-specific fixes."
+config_file = "agents/wiz-build-troubleshooter.toml"
+
+[agents.wiz_reviewer]
+description = "WIZ reviewer focused on framework-specific regressions, MCP boundaries, frontend/backend rules, and build requirements."
+config_file = "agents/wiz-reviewer.toml"
+
 [mcp_servers.github]
 command = "npx"
 args = ["-y", "@modelcontextprotocol/server-github"]

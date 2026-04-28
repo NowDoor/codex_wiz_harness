@@ -1,119 +1,106 @@
-# WIZ Framework — Codex Agent Instructions
+# WIZ Project - Codex Agent Instructions
 
-이 프로젝트는 **WIZ(Season) 프레임워크** 기반 웹 애플리케이션이다. 전체 개발 인스트럭션은 `.github/copilot-instructions.md`에 정의되어 있으며, 이 문서는 Codex 에이전트용 요약이다.
+이 문서는 WIZ(Season) 프레임워크 프로젝트 루트에 두는 범용 `AGENTS.md`이다. 특정 서비스나 저장소 이름에 묶이지 않고, 새 WIZ 프로젝트를 만들거나 기존 WIZ 프로젝트를 수정할 때 공통으로 적용한다.
 
-> **필독**: 작업 전 반드시 `.github/copilot-instructions.md`를 읽어라. 1400줄 분량의 완전한 개발 규칙·API 참조·트러블슈팅이 포함되어 있다.
-
----
-
-## Codex 적용/배포
-
-이 repo는 Codex CLI 재적용용 설정을 포함한다.
-
-- `.codex/config.toml` — MCP와 multi-agent baseline
-- `.codex/agents/` — Codex가 직접 로드하는 TOML child agent role 설정
-- `.agents/skills/` — 설치된 non-system Codex skill 전체 스냅샷
-- `.agents/ecc-agents/` — ECC upstream Markdown agent 템플릿
-- `.agents/kiro-agents/` — Kiro agent 템플릿
-- `agents/`, `skills/`, `commands/`, `rules/`, `hooks/`, `scripts/`, `contexts/`, `mcp-configs/` — ECC 원본 구조 호환용 snapshot
-- `.codex-plugin/plugin.json` — Codex plugin manifest
-- `.claude-plugin/plugin.json` — Claude plugin manifest 보존본
-- `.agents/plugins/marketplace.json` — local marketplace catalog
-- `scripts/sync-codex-config.sh` — 위 설정을 `~/.codex/`로 병합
-- `scripts/wiz-mcp-launcher.sh` — VS Code WIZ 확장을 찾아 WIZ MCP 실행
-
-새 환경에서 적용:
-
-```bash
-scripts/sync-codex-config.sh
-```
-
-MCP baseline을 강제로 갱신해야 하면:
-
-```bash
-scripts/sync-codex-config.sh --update-mcp
-```
-
-WIZ MCP는 `.vscode/mcp.json`의 WIZ 확장 설정과 같은 서버를 사용한다. Codex에서는 `scripts/wiz-mcp-launcher.sh`가 설치된 `season-framework.wiz-vscode` 확장을 자동 탐색한다.
-
-주의: ECC upstream의 Markdown agent 템플릿은 Codex-native TOML role과 형식이 다르다. 그대로 배포는 하되, Codex child agent로 활성화하려면 `.codex/agents/*.toml` 형식으로 변환해야 한다.
-
-주의: Claude식 `commands/`, `hooks/`, `rules/`는 Codex에서 동일하게 자동 실행되지 않는다. `scripts/sync-codex-config.sh`는 `commands/*.md`를 Codex prompt shim으로 변환하고, 나머지는 `~/.codex/ecc-assets/`에 보존한다.
+작업 전 반드시 현재 WIZ workspace와 활성 프로젝트를 확인한다. 실제 수정 대상은 `wiz_workspace_status`가 알려주는 `currentProject`이며, 다른 프로젝트 디렉토리는 사용자가 명시적으로 전환을 요청하기 전까지 수정하지 않는다.
 
 ---
 
-## 프로젝트 구조
+## 작업 시작 규칙
 
-```
-/opt/app/
-├── config/              # 프레임워크 config (boot.py — 수정 주의)
-├── public/              # 앱 엔트리포인트
-├── project/main/        # 현재 활성 프로젝트
-│   └── src/
-│       ├── app/         # Angular 앱 (page.*/layout.*/component.*)
-│       ├── controller/  # 백엔드 전처리 (인증/권한)
-│       ├── model/       # DB/Struct 모델
-│       ├── route/       # REST API 라우트
-│       └── portal/      # 패키지 (재사용 모듈)
-├── ide/                 # WIZ IDE 소스
-├── plugin/              # 플러그인
-├── data/                # 정적 데이터 (boot.py /data/ 라우트로 서빙)
-└── .github/             # 인스트럭션·문서
-```
+1. `wiz_workspace_status`로 workspace root와 `currentProject`를 확인한다.
+2. 프로젝트에 `.github/custom/custom-instructions.md`가 있으면 먼저 읽는다. 참조 파일이 있으면 함께 읽고, 충돌 시 custom 규칙을 우선한다.
+3. 프로젝트에 `.github/copilot-instructions.md`, `.github/short-instructions.md`, `.github/devdocs/**`가 있으면 해당 프로젝트 문서를 우선한다.
+4. 프로젝트 문서가 없거나 부족하면 설치된 범용 WIZ 문서인 `${CODEX_HOME:-~/.codex}/ecc-assets/github/**`를 기준으로 삼는다.
+5. 앱 생성, 파일 읽기/쓰기, 빌드, 상태 확인은 WIZ MCP 도구를 우선 사용한다.
 
-## MCP 도구 사용 (필수)
+## 프로젝트 경계
 
-이 프로젝트에는 WIZ MCP 서버가 연결되어 있다. **앱 생성·파일 읽기/쓰기·빌드** 등은 반드시 MCP 도구를 우선 사용한다.
+- 현재 프로젝트 경로는 `project/{currentProject}/`이다.
+- `project/{currentProject}/src/app/**`, `src/controller/**`, `src/model/**`, `src/route/**`는 Source 영역이다.
+- `project/{currentProject}/src/portal/{package}/**`는 Package 영역이다.
+- `project/{currentProject}/config/**`는 프로젝트 설정 영역이다.
+- workspace 루트의 `config/`, `public/`, `ide/`, `plugin/` 등 프레임워크/IDE 영역은 사용자가 명시하지 않으면 수정하지 않는다.
+- `project/{다른이름}/`은 읽기, 쓰기, 복사, 삭제 모두 금지한다.
 
-### MCP 도구 카테고리
+## MCP 도구 선택
 
-| 카테고리 | 대상 경로 | 도구 접두사 |
-|---------|----------|------------|
-| Workspace | 워크스페이스 루트 | `wiz_workspace_*` |
-| Project | `project/{name}/` | `wiz_project_*` |
-| Source | `src/app/`, `src/route/`, `src/controller/` | `wiz_source_*` |
-| Package | `src/portal/{package}/` | `wiz_package_*` |
+| 대상 | 사용할 도구 |
+|------|-------------|
+| workspace 상태, 프로젝트 목록 | `wiz_workspace_*` |
+| `project/{currentProject}/config`, `src/angular`, `src/assets`, 빌드 | `wiz_project_*` |
+| `src/app`, `src/controller`, `src/model`, `src/route` | `wiz_source_*` |
+| `src/portal/{package}` | `wiz_package_*` |
 
-### Source vs Package 구분 (혼용 금지)
+`src/portal/**` 파일에 `wiz_source_*`를 쓰지 않고, Source 파일에 `wiz_package_*`를 쓰지 않는다.
 
-- `src/portal/` 하위 → **`wiz_package_*`** 도구
-- `src/app/`, `src/route/` 등 → **`wiz_source_*`** 도구
+## 개발 순서
 
-## 핵심 규칙 요약
+데이터와 도메인 구조를 먼저 잡고 UI를 붙인다.
 
-1. **wiz.response는 try 블록 바깥에서 호출** — `ResponseException`이 `except`에 잡힘
-2. **Pug `#ref=""`** — 반드시 빈 문자열 값 명시 (NG0301 방지)
-3. **Tailwind 소수점/슬래시 클래스** — `class=""` 속성 방식 필수
-4. **Pug 멀티라인 속성** — 첫 속성은 `(`와 같은 줄에
-5. **`:host` 스타일 필수** — Page/Layout의 `view.scss`에 `:host { display: block; height: 100%; }`
-6. **service.render() 호출 필수** — 상태 변경 후 UI 갱신
-7. **빌드**: `wiz_project_build` (새 API 함수 추가/삭제 시 `clean: true`)
-8. **서버 재시작 금지** — hot-reload 지원
-9. **현재 프로젝트만 수정** — 다른 프로젝트 접근 금지
+1. DB/config 필요 여부 확인
+2. Model/Struct 설계
+3. Controller/Route/API 설계
+4. Layout/Page/Component 생성
+5. view.ts/view.pug/view.scss 구현
+6. 빌드 및 검증
 
-## API 참조 (빠른 참고)
+공통 기능은 `src/portal/{package}/`로 분리하고, 프로젝트 고유 기능만 Source 영역에 둔다.
 
-```python
-# 백엔드 (api.py, controller.py)
-wiz.model("portal/{pkg}/{name}")        # Model 로딩
-wiz.request.query("key", "default")     # 요청 파라미터 (항상 문자열)
-wiz.response.status(200, data=result)   # JSON 응답 (즉시 종료)
-wiz.session.get("key")                  # 세션 조회
-wiz.controller("base")                  # Controller 상속
-wiz.project.fs("data")                  # 파일시스템
-```
+## 백엔드 규칙
 
-```typescript
-// 프론트엔드 (view.ts)
-import { Service } from '@wiz/libs/portal/season/service';
-await wiz.call("functionName", { key: value }); // api.py 함수 호출
-await this.service.render();  // UI 갱신 (필수)
-```
+- DB Model은 스키마와 ORM 연결만 담당한다.
+- 비즈니스 로직은 Struct, api.py, route 계층에 둔다.
+- `wiz.response.status()`와 redirect 계열은 성공 경로의 `try` 블록 안에서 호출하지 않는다.
+- `wiz.request.query()`는 문자열을 반환하므로 숫자 비교 전 `int()` 등으로 변환한다.
+- JSON body를 직접 받을 때는 `wiz.request.query()`가 파싱하지 못할 수 있으므로 요청 형식과 파싱 방식을 확인한다.
+- `except:` 같은 bare except를 쓰지 않는다.
+- 권한 검증에서 `role not in "admin"` 같은 문자열 포함 비교를 쓰지 않는다.
+- config 파일에서 DB 쿼리나 무거운 런타임 작업을 하지 않는다.
 
-## 커스텀 인스트럭션
+## 프론트엔드 규칙
 
-`.github/custom/custom-instructions.md`가 있으면 추가 참조. 충돌 시 Custom 우선.
+- 모든 Page/Layout/Component는 프로젝트 Service 패턴을 따른다.
+- 초기화 시 `service.init()`과 `service.render()` 호출 필요 여부를 확인한다.
+- 상태 변경 후 UI 갱신이 필요하면 `service.render()`를 호출한다.
+- `wiz.call()`은 현재 App 자신의 `api.py` 함수만 호출한다.
+- Portal App이 부모 Page의 `api.py`를 호출한다고 가정하지 않는다.
+- Angular 라우팅 파라미터 변경 시 컴포넌트 재사용을 고려한다.
+- Page/Layout의 `view.scss`에는 `:host` 레이아웃 규칙을 둔다.
 
-## Task 관리
+## Pug와 스타일 규칙
 
-`작업 수행해줘` 요청 시 `.github/task/todo.md`를 읽어 순서대로 수행.
+- Angular 템플릿 참조 변수는 `#ref=""`처럼 빈 문자열 값을 명시한다.
+- Tailwind 클래스에 소수점이나 슬래시가 있으면 Pug dot notation 대신 `class=""` 속성을 사용한다.
+- Pug 멀티라인 속성은 첫 속성을 여는 괄호와 같은 줄에 둔다.
+- flex column 안의 스크롤 영역에는 `min-h-0`을 고려한다.
+- 패키지 스타일을 추가하면 `src/angular/styles/styles.scss` import 체인을 확인한다.
+
+## Package 규칙
+
+- `src/portal/{package}/README.md`가 있으면 generic devdocs보다 해당 README를 최종 권위로 본다.
+- 패키지 API, libs, model, component, style을 바꾸면 README 갱신 필요 여부를 확인한다.
+- `portal.json` metadata가 필요한 구성요소를 추가/삭제하면 함께 갱신한다.
+- Package 파일은 `wiz_package_*`로 다룬다.
+
+## 빌드 규칙
+
+- 기본 빌드는 `wiz_project_build`의 normal build를 사용한다.
+- 새 API 함수 추가, API 함수 삭제, API 함수 이름 변경은 clean build가 필요하다.
+- `socket.py` 추가/수정은 WIZ 문서의 재시작 요구를 확인하되, 서버 재시작은 parent agent와 사용자 승인 없이 수행하지 않는다.
+- `build/`, `bundle/` 등 산출물은 직접 편집하지 않는다.
+
+## 트러블슈팅 우선순위
+
+1. WIZ MCP 상태와 `currentProject` 확인
+2. Source/Package 도구 경계 확인
+3. Pug 문법, Tailwind class 표현, `#ref=""` 확인
+4. `wiz.response.status()` 위치 확인
+5. 새 API 함수 여부와 clean build 필요성 확인
+6. package README와 styles import 확인
+7. 로그와 빌드 에러의 실제 파일 경로 확인
+
+## Task 처리
+
+- 프로젝트에 `.github/task/todo.md`가 있고 사용자가 작업 수행을 요청하면 해당 파일의 작업을 순서대로 처리한다.
+- 사용자가 명시하지 않은 별도 작업 파일이나 보고서를 만들지 않는다.
